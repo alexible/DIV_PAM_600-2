@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>82nd ABN All-American Standards</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+        }
+
+        h2 {
+            text-align: center;
+            color: #ff3b3b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 15px 0;
+            font-size: 1.5rem;
+        }
+
+        .card-container {
+            width: 95%;
+            max-width: 600px;
+            height: 420px;
+            perspective: 1000px;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .front,
+        .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-sizing: border-box;
+            border-radius: 15px;
+            border: 4px solid #ff3b3b;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .front {
+            background: #1e1e1e;
+            font-size: 1.4rem;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .back {
+            background: #8b0000;
+            transform: rotateY(180deg);
+            font-size: 1.2rem;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .ref {
+            font-size: 0.85rem;
+            margin-top: 20px;
+            color: #ffd700;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        button {
+            flex: 1;
+            padding: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            background: #ff3b3b;
+            color: white;
+            box-shadow: 0 5px 0 #5e0000;
+            transition: all 0.1s;
+        }
+
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #5e0000;
+        }
+
+        .progress {
+            margin-top: 25px;
+            color: #aaa;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>82nd ABN All-American Standards</h2>
+
+    <div class="card-container" onclick="flipCard()">
+        <div class="card" id="card">
+            <div class="front" id="frontText">...</div>
+            <div class="back">
+                <div id="backText">...</div>
+                <div class="ref" id="refText">...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="prevCard(event)">PREVIOUS</button>
+        <button onclick="nextCard(event)">NEXT</button>
+    </div>
+
+    <div class="progress" id="progressText"></div>
+
+    <script>
+        const flashcards = [
+            { q: "What is the 82nd Airborne Division Mission Concept?", a: "Within 18 hours of notification, strategically deploy, conduct forcible entry parachute assault, and secure key objectives.", ref: "Page 5, Para 4" },
+            { q: "When and where was the 82nd Infantry Division formed?", a: "August 25, 1917, at Camp Gordon, Georgia.", ref: "Appendix B, Page 81" },
+            { q: "When did the 82nd become the Army's first airborne division?", a: "August 15, 1942.", ref: "Appendix B, Page 81" },
+            { q: "What is the Division standard for the 4-mile run?", a: "36 minutes.", ref: "Section 16, Page 41" },
+            { q: "What are the three primary causes of POV accidents?", a: "1. Drinking and driving\n2. Falling asleep at the wheel\n3. Speed to the point of losing control.", ref: "Page 8, Para 2" },
+            { q: "Who earned the nickname 'Devils in Baggy Pants'?", a: "The 504th Parachute Infantry Regiment during combat at Anzio in January 1944.", ref: "Appendix B, Page 81" },
+            { q: "What are the 5 steps of the Risk Management Process?", a: "1. Hazard Identification\n2. Initial Assessment\n3. Develop Controls\n4. Implement Controls\n5. Supervise and Evaluate.", ref: "Page 5, Para 5A" },
+            { q: "What is the maximum speed for tactical vehicles on Fort Bragg hard surfaces?", a: "45 MPH.", ref: "Page 17, Para 3a" },
+            { q: "What is the Division greeting and response?", a: "Greeting: 'All the Way, Sir/Ma'am!'\nResponse: 'Airborne!'", ref: "Page 42, Para 17B" },
+            { q: "How many liters of malt beverages (beer) may a Trooper possess in barracks?", a: "No more than ten liters (approximately 1 case of 12-ounce cans).", ref: "Page 49, Para 4a" },
+            { q: "What is the acronym 'COLD' for winter clothing?", a: "Clean, Overdress (avoid), Layer, Dry.", ref: "Page 13, Para E" },
+            { q: "What is the weight control evaluation frequency?", a: "During APFT or at least once every six months.", ref: "Page 41, Para 16B" },
+            { q: "Who is responsible for the appearance of subordinate Troopers?", a: "Noncommissioned officers (NCOs).", ref: "Page 5, Para 2" },
+            { q: "What were the first two combat operations for the 82nd in WWII?", a: "Sicily (July 9, 1943) and Salerno (Sept 13, 1943).", ref: "Appendix B, Page 81" },
+            { q: "What is the proper saluting distance?", a: "Recognition distance (usually six paces).", ref: "Page 42, Para 17B" },
+            { q: "When are vehicle ground guides required?", a: "In congested, confined, or bivouac areas, or during reduced visibility.", ref: "Page 16, Para 1" },
+            { q: "What is the first step in clearing an M4 Carbine or M16 Rifle?", a: "Point the weapon into a clearing barrel and orient in a safe direction.", ref: "Appendix F, Page 96" },
+            { q: "What is the status 'Amber' for an M4/M16?", a: "Magazine in weapon; No round in chamber; Weapon on SAFE.", ref: "Appendix F, Page 97" },
+            { q: "What is 'America's Guard of Honor' referring to?", a: "The title given by Gen. Patton in 1945 after being impressed by the 82nd Honor Guard in Berlin.", ref: "Appendix B, Page 82" },
+            { q: "Within how many days must a new firearm be registered with the Provost Marshal?", a: "Within five working days of residing on Fort Bragg or purchasing the weapon.", ref: "Page 50, Para 1" }
+        ];
+
+        let currentIndex = 0;
+        const card = document.getElementById('card');
+        const frontText = document.getElementById('frontText');
+        const backText = document.getElementById('backText');
+        const refText = document.getElementById('refText');
+        const progressText = document.getElementById('progressText');
+
+        function updateCard() {
+            card.classList.remove('flipped');
+            setTimeout(() => {
+                frontText.innerText = flashcards[currentIndex].q;
+                backText.innerText = flashcards[currentIndex].a;
+                refText.innerText = flashcards[currentIndex].ref;
+                progressText.innerText = `CARD ${currentIndex + 1} OF ${flashcards.length}`;
+            }, 150);
+        }
+
+        function flipCard() {
+            card.classList.toggle('flipped');
+        }
+
+        function nextCard(event) {
+            event.stopPropagation();
+            currentIndex = (currentIndex + 1) % flashcards.length;
+            updateCard();
+        }
+
+        function prevCard(event) {
+            event.stopPropagation();
+            currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+            updateCard();
+        }
+
+        // Initialize
+        window.onload = updateCard;
+    </script>
+</body>
+
+</html>
